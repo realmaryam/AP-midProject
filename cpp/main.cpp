@@ -4,6 +4,7 @@
 
 int main()
 {
-    std::cout<<"project starting\n";
+    std::cout<<"hi there"<<std::endl;
     return 0;
+    
 }
