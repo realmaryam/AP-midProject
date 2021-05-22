@@ -1,10 +1,10 @@
 #include<iostream>
-
+#include"Maze.h"
 
 
 int main()
 {
-    std::cout<<"hi there"<<std::endl;
+    std::cout<<"hiiiiiiii\n";
+    Maze a {1 , 2};
     return 0;
-    
 }
