@@ -2,10 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define NORTH 0
-#define EAST 1
-#define SOUTH 2
-#define WEST 3
+#define EAST 0
+#define SOUTH 1
 
 Maze::Vertex::Vertex()
     : Vertex(0 , 0)
@@ -49,18 +47,24 @@ bool Maze::IsOutput( Vertex v )
     return false;
 }
 
-void Maze::makeMainpath ()
+void Maze::visit( Vertex v )
 {
-    //size_t line { MazeWidth }
-    // current.location.first = 0;
-    // current.location.second = 0;
-    //Vertex current { V[0] };
-
-    while( !IsOutput(V[0]) )
+    int r{};
+    if(v.dirdown == 0)
+        v.neighbour = EAST;
+    if(v.dirright == 0)
+        v.neighbour = SOUTH;
+    if(v.dirdown == 0 && v.dirright == 0 )
+        v.neighbour = 2 ;
+    else
     {
-        
+        r = rand() %2;
+        if(r == 0 )
+            v.neighbour = EAST;
+        if(r == 1 )
+            v.neighbour = SOUTH;
     }
-    
+        
 }
 
 void Maze::makeMaze ()
@@ -70,15 +74,20 @@ void Maze::makeMaze ()
         for(int i{0}; i< MazeWidth ; i++)
             {
                 Vertex v (i , j);
-                V.push_back( v );
-                if( v.location.second == 0)
-                   v.dirs[NORTH] = 0; 
+                V[j].push_back( v );
+                // if( v.location.second == 0)
+                //    v.dirs[NORTH] = 0; 
                 if( v.location.first == MazeWidth-1)
-                   v.dirs[EAST] = 0; 
-                if( v.location.first == 0)
-                   v.dirs[WEST] = 0; 
+                   v.dirright = 0; 
+                // if( v.location.first == 0)
+                //    v.dirs[WEST] = 0; 
                 if( v.location.second == MazeHeight-1)
-                   v.dirs[SOUTH] = 0;     
+                   v.dirdown = 0;     
             }
-    makeMainpath();
+    for(int j{0}; j< MazeHeight ; j++)
+        for(int i{0}; i< MazeWidth ; i++)
+        {
+            visit( V[j][i]);
+        }
+    
 }

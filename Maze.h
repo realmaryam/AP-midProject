@@ -15,16 +15,18 @@ public:
         Vertex();
         Vertex( int , int );
         std::pair<int, int> location;
-        int dirs[2] { 1 , 1 } ;
-        int dirright {} , dirleft {} ;
+        int neighbour {};
+        int dirright { 1 } , dirdown { 1 } ;
+        std::vector<Vertex> adjacent;
         
     private:
         size_t Visited;
         std::stack<std::pair<int, int>> stack;
-        std::vector<int> neighbours{std::vector<int>(3,0)};
+        
     };
     Maze(int Height , int Width);
     void makeMaze ();
+    void visit( Vertex );
     void makeMainpath();
     int IsInBounds( int x, int y );
     bool IsOutput(Vertex);
