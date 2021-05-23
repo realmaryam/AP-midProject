@@ -1,14 +1,24 @@
 #include"Maze.h"
 
-
-Maze::Maze(size_t Height , size_t Width)
-    : MazeHeight { Height }
-    , MazeWidth { Width }
+Maze::Vertex::Vertex( int fx , int fy )
+    : final_x { fx }
+    , final_y { fy }
 {
-    //Vertex.final_x = 5;
+}
+
+Maze::Maze(size_t m , size_t n)
+    : MazeWidth { m }
+    , MazeHeight { n }
+{
+    Vertex( m*CellWidth , n*CellWidth);
 }
 
 void Maze::makeMaze ()
 {
-    std::cout<<"hiiiiiiii\n";
+    std::cout<<"# #";
+    for (size_t i {}; i < MazeWidth * CellWidth ; i++)
+    {
+        std::cout<< "#";
+    }
+    
 }

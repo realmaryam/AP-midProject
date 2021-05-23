@@ -11,10 +11,12 @@ public:
     class Vertex
     {
     public:
+        Vertex( int , int );
 
     private:
         int init_x{} , init_y {},  final_x {} , final_y {};
-        size_t  Visited;
+        std::pair<int, int> location;
+        size_t Visited;
         std::stack<std::pair<int, int>> stack;
         std::vector<int> neighbours;
 
@@ -24,7 +26,26 @@ public:
 private:
     size_t  MazeWidth;
 	size_t  MazeHeight;
+    size_t CellWidth { 2 };
 	//int* MazeSize;
+    /*
++--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+|        |           |                          |
++  +--+  +  +--+  +  +  +--+--+--+--+--+  +--+--+
+|     |  |  |  |  |  |     |           |        |
++--+  +  +  +  +  +--+--+  +--+--+--+  +--+--+  +
+|     |  |     |        |        |     |        |
++  +--+  +--+--+  +--+  +--+--+  +  +--+  +--+  +
+|     |        |     |        |  |  |     |  |  |
++--+--+--+--+  +  +--+--+  +  +  +  +  +--+  +  +
+|        |     |  |     |  |        |  |  |     |
++  +--+  +  +--+  +  +  +--+--+--+--+  +  +  +--+
+|  |     |  |     |  |        |        |  |  |  |
++  +  +--+  +--+--+  +--+--+  +  +--+--+  +  +  +
+|  |     |     |     |     |     |        |  |  |
++  +--+  +--+  +  +--+  +--+--+--+  +--+--+  +  +
+|     |           |                             |
++--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ */
 
 };
 
