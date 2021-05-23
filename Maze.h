@@ -18,15 +18,17 @@ public:
         std::pair<int, int> location;
         size_t Visited;
         std::stack<std::pair<int, int>> stack;
-        std::vector<int> neighbours;
-
+        std::vector<int> neighbours{std::vector<int>(3,0)};
     };
     Maze(size_t Height , size_t Width);
     void makeMaze ();
+    void makeMainpath();
 private:
     size_t  MazeWidth;
 	size_t  MazeHeight;
     size_t CellWidth { 2 };
+    std::vector<Vertex> mainPath ;
+    std::vector<Vertex> V ;
 	//int* MazeSize;
     /*
 +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+

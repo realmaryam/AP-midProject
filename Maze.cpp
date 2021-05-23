@@ -1,4 +1,6 @@
 #include"Maze.h"
+#include <stdlib.h>
+#include <time.h>
 
 Maze::Vertex::Vertex( int fx , int fy )
     : final_x { fx }
@@ -11,14 +13,10 @@ Maze::Maze(size_t m , size_t n)
     , MazeHeight { n }
 {
     Vertex( m*CellWidth , n*CellWidth);
+    
 }
 
 void Maze::makeMaze ()
 {
-    std::cout<<"# #";
-    for (size_t i {}; i < MazeWidth * CellWidth ; i++)
-    {
-        std::cout<< "#";
-    }
     
 }
