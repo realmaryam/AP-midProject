@@ -12,10 +12,9 @@ public:
     {
     public:
         Vertex( int , int );
-
-    private:
-        int init_x{} , init_y {},  final_x {} , final_y {};
         std::pair<int, int> location;
+        int dirs[4] { 1 , 1 , 1 , 1} ;
+    private:
         size_t Visited;
         std::stack<std::pair<int, int>> stack;
         std::vector<int> neighbours{std::vector<int>(3,0)};
@@ -23,7 +22,12 @@ public:
     Maze(size_t Height , size_t Width);
     void makeMaze ();
     void makeMainpath();
+    int IsInBounds( int x, int y );
+    bool IsOutput(Vertex);
 private:
+    int init_x{} , init_y {},  final_x {} , final_y {};
+    int XYToIndex( int x, int y ){return y * MazeHeight + x;}
+    Vertex current ;
     size_t  MazeWidth;
 	size_t  MazeHeight;
     size_t CellWidth { 2 };
