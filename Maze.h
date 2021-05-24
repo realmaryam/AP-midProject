@@ -27,7 +27,7 @@ public:
     };
     Maze(int Height , int Width);
     void makeMaze ();
-    void visit( Vertex );
+    void visit( Vertex &);
     void makeMainpath();
     int IsInBounds( int x, int y );
     bool IsOutput( Vertex );
@@ -36,6 +36,7 @@ public:
 private:
     int init_x{} , init_y {},  final_x {} , final_y {};
     int XYToIndex( int x, int y ){return y * MazeHeight + x;}
+    int nextLine( int i ){return i + MazeWidth;}
  //   std::unique_ptr<Vertex> current ;
     int  MazeWidth;
 	int  MazeHeight;
@@ -43,7 +44,8 @@ private:
     size_t CellWidth { 2 };
     std::vector<Vertex> mainPath ;
     std::vector<std::vector<Vertex>> V ;
-    std::shared_ptr<Vertex> p ;
+    //std::shared_ptr<Vertex> p ;
+    Vertex* p;
 	//int* MazeSize;
     /*
 +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
