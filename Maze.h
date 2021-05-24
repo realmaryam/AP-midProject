@@ -17,11 +17,11 @@ public:
         std::pair<int, int> location;
         int neighbour {};
         int dirright { 1 } , dirdown { 1 } ;
-        std::vector<Vertex> adjacent;
+       // std::vector<std::pair<int,int>> adjacent;
         
     private:
-        size_t Visited;
-        std::stack<std::pair<int, int>> stack;
+        //size_t Visited;
+        //std::stack<std::pair<int, int>> stack;
         
     };
     Maze(int Height , int Width);
@@ -30,15 +30,18 @@ public:
     void makeMainpath();
     int IsInBounds( int x, int y );
     bool IsOutput(Vertex);
+    void show ();
 private:
     int init_x{} , init_y {},  final_x {} , final_y {};
     int XYToIndex( int x, int y ){return y * MazeHeight + x;}
  //   std::unique_ptr<Vertex> current ;
     int  MazeWidth;
 	int  MazeHeight;
+    char* grid ;
     size_t CellWidth { 2 };
     std::vector<Vertex> mainPath ;
     std::vector<std::vector<Vertex>> V ;
+    Vertex* p ;
 	//int* MazeSize;
     /*
 +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
