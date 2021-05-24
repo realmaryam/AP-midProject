@@ -83,7 +83,7 @@ void Maze::makeMaze ()
            for(int i{0}; i< MazeWidth ; i++)
             {   
                 //Vertex v {i , j };
-                Vertex* p = new Vertex { i , j } ;
+                std::shared_ptr<Vertex> p (new Vertex {i ,j});
                 std::cout<<"here is Make maze\n";
                 V[j].push_back( *p );
                 // if( v.location.second == 0)
@@ -104,24 +104,42 @@ void Maze::makeMaze ()
     
 }
 
+
+void Maze::check( std::vector<std::vector<Vertex>> V , int x , int y)
+{
+    V[y][x].status = 1;
+    if ( V[y][x].neighbour == EAST && V[y][x].dirright && !V[y][x+1].status)
+                {
+                    grid[ XYToIndex(x , y) ] = ' ';
+                    check ( V , x+1 , y );
+                }
+    if ( V[y][x].neighbour == SOUTH && V[y][x].dirdown && !V[y+1][x].status)
+                {
+                    grid[ XYToIndex(x , y) ] = ' ';
+                    check ( V , x , y+1 );
+                }
+}
+
 void Maze::show()
 {
-    char grid [ MazeWidth * MazeHeight ];
+    std::shared_ptr<char[]> grid (new char [ MazeWidth * MazeHeight ]);
     for (int i {}; i < MazeWidth * MazeHeight ; i++)
     {
-        grid[i]= '#';
+        grid[i]= '#' ;
         
     }
-      for (int i {}; i < MazeWidth * MazeHeight ; i++)
-    {
-       std::cout<<grid[i];
-        
-    }
+ 
     
-    for(int j{0}; j< MazeHeight ; j++)
-        for(int i{0}; i< MazeWidth ; i++)
+    for(int j{}; j< MazeHeight ; j++)
+        for(int i{}; i< MazeWidth ; i++)
+            check( V , i , j);
+
+       for(int j{}; j< MazeHeight ; j++)
+    {    
+        for(int i{}; i<  MazeWidth ; i++)
         {
-            if ( V[j][i].neighbour == EAST)
-                grid[ j * MazeWidth +i ] = ' ';
+            std::cout<<grid[i];
         }
+        std::cout<<std::endl;
+    }
 }

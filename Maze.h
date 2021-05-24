@@ -17,6 +17,7 @@ public:
         std::pair<int, int> location;
         int neighbour {};
         int dirright { 1 } , dirdown { 1 } ;
+        int status { };
        // std::vector<std::pair<int,int>> adjacent;
         
     private:
@@ -29,19 +30,20 @@ public:
     void visit( Vertex );
     void makeMainpath();
     int IsInBounds( int x, int y );
-    bool IsOutput(Vertex);
-    void show ();
+    bool IsOutput( Vertex );
+    void show ( std::vector<std::vector<Vertex>> V );
+    void check ( std::vector<std::vector<Vertex>> V , int , int );
 private:
     int init_x{} , init_y {},  final_x {} , final_y {};
     int XYToIndex( int x, int y ){return y * MazeHeight + x;}
  //   std::unique_ptr<Vertex> current ;
     int  MazeWidth;
 	int  MazeHeight;
-    char* grid ;
+    std::vector<std::vector<char>> grid ;
     size_t CellWidth { 2 };
     std::vector<Vertex> mainPath ;
     std::vector<std::vector<Vertex>> V ;
-    Vertex* p ;
+    std::shared_ptr<Vertex> p ;
 	//int* MazeSize;
     /*
 +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
