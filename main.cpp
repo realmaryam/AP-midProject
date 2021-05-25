@@ -3,9 +3,9 @@
 #include <ctime>
 #include <vector>
 #define RESET   "\033[0m"
-#define BLACK   "\033[30m"      /* Black */
-#define RED     "\033[31m"      /* Red */
-#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[1m\033[33m"      /* Bold Yellow */
+#define RED     "\033[1m\033[31m"      /* Bold Red */
+#define GREEN   "\033[1m\033[32m"      /* Bold Green */
 #include "room.h"
 
 
@@ -18,6 +18,9 @@ void updatePaths(Room **maze, int size, int oldPath, int newPath);
 void DFS(Room **maze , int size);
 std::vector<Room>& nextPath(Room **maze, int size , std::pair<int,int> ,
 	 std::vector<Room>& way , std::vector<Room> &total );
+bool isIn (Room *room, std::vector<Room>& vector);
+void showDFS(Room **maze, int size, std::vector<Room>& way, std::vector<Room>& total );
+void showCleaned(Room **maze, int size, std::vector<Room>& way);
 
 int main(){
 	int size;
@@ -79,7 +82,7 @@ int main(){
 	maze[size - 1][size - 1].setSouth(1);
 	
 	std::cout << "\nCurrent Maze:\n";
-
+	std::cout << GREEN;
 	for(int i = 0; i < size; i++){
 		if(maze[0][i].getNorth() == 0){
 			std::cout << "+---";
@@ -106,6 +109,7 @@ int main(){
 		}
 		std::cout << "+\n";
 	}
+	std::cout<<RESET;
 	
 	DFS(maze , size);
 
@@ -200,85 +204,11 @@ void DFS( Room** maze , int size )
 {
     std::vector<Room> way;
 	std::vector<Room> total;
-    int x {} , y {};
 	way.push_back(maze[0][0]);
 	total.push_back(maze[0][0]);
     way = nextPath( maze, size , {0 ,0} , way , total);
-    
-	std::cout << "\nDFS method solved Maze:\n"<<way.size()<<std::endl;
-
-	int check {};
-	for(int i = 0; i < size; i++){
-		if(maze[0][i].getNorth() == 0){
-			std::cout << "+---";
-		} else {
-			std::cout << "+ * ";
-		}
-	}
-	std::cout << "+\n";
-	for(int i = 0; i < size; i++){
-		for(int j = 0; j < size; j++)
-		{	
-			check =0;
-			for( int t {}; t<way.size(); t++)
-			{	
-				if(way[t] == maze[i][j])
-				{
-					check =1;
-					if(maze[i][j].getWest() == 0)
-					{
-						std::cout << "| * ";	
-					} else {
-						std::cout << "  * ";
-					}
-					
-				}
-			}
-
-			if(!check)
-			{
-				if(maze[i][j].getWest() == 0)
-				{
-
-					std::cout << "|   ";	
-				} else {
-					std::cout << "    ";
-				}
-			}
-		}
-		
-		std::cout << "|\n";
-		for(int j = 0; j < size; j++)
-		{
-			 check=0;
-			// for( int t {}; t<way.size(); t++)
-			// {	
-				
-			// 	if(i!=(size-1) && way[t] == maze[i][j] )
-			// 	{
-			// 		check =1;
-			// 		if(i!=(size-1)&& maze[i+1][j].getNorth() == 1 && maze[i][j].getSouth() == 1 )
-			// 		{
-			// 			std::cout << "+ * ";
-						
-			// 		} else {
-			// 			std::cout << "+---";
-			// 		}
-			// 		break;
-			// 	}
-			// }
-			// if(!check)
-			// {
-				if(maze[i][j].getSouth() == 0)
-				{
-					std::cout << "+---";
-				} else {
-					std::cout << "+   ";
-				}
-		//	}
-		}
-		std::cout << "+\n";
-	}
+	showCleaned(maze , size , way);
+	
 std::cout << RED << "hello world" << RESET << std::endl;
 
 }
@@ -293,9 +223,7 @@ std::vector<Room>& nextPath(Room **maze , int size, std::pair<int,int> location 
     maze[y][x].setVisited(1);
 
 	if(final ==(size*size)-1)
-	{
 		return way;
-	}
 		
 	if(final !=(size*size)-1)
 	{
@@ -341,5 +269,158 @@ std::vector<Room>& nextPath(Room **maze , int size, std::pair<int,int> location 
     	}
         		way.pop_back();
 				return way;
+	}
+	return way;
+}
+
+bool isIn (Room *room, std::vector<Room>& vector)
+{
+	for( size_t i{}; i<vector.size(); i++)
+	{
+		if(*room == vector[i])
+			return true;
+	}
+	return false;
+}
+
+void showDFS(Room **maze, int size, std::vector<Room>& way, std::vector<Room>& total )
+{
+	   
+	std::cout << "\nDFS method solved Maze:\n"<<way.size()<<total.size()<<std::endl;
+
+	int check {};
+	for(int i = 0; i < size; i++){
+		if(maze[0][i].getNorth() == 0){
+			std::cout << "+---";
+		} else {
+			std::cout << "+ * ";
+		}
+	}
+	std::cout << "+\n";
+	for(int i = 0; i < size; i++){
+		for(int j = 0; j < size; j++)
+		{	
+			check =0;
+			if(isIn(&maze[i][j], way))
+			{
+				{
+					check =1;
+					if(maze[i][j].getWest() == 0)
+					{
+						std::cout << "| * ";	
+					} else {
+						std::cout << "  * ";
+					}
+					
+				}
+			}
+
+			if(!check)
+			{
+				if(maze[i][j].getWest() == 0)
+				{
+
+					std::cout << "|   ";	
+				} else {
+					std::cout << "    ";
+				}
+			}
+		}
+		
+		std::cout << "|\n";
+		for(int j = 0; j < size; j++)
+		{
+			 check=0;
+				if(maze[i][j].getSouth() == 0)
+				{
+					std::cout << "+---";
+				}
+				 else {
+					 if(i == (size-1) && j==(size-1))
+						std::cout << "+ * ";
+					else
+						std::cout << "+   ";
+				}
+		}
+		std::cout << "+\n";
+	}
+}
+
+void showCleaned(Room **maze, int size , std::vector<Room>& way)
+{
+		std::cout << "\nDFS method solved Maze:\n"<<GREEN<<std::endl;
+
+	int check {};
+	for(int i = 0; i < size; i++){
+		if(maze[0][i].getNorth() == 0){
+			std::cout<< "+---";
+			
+		} 
+		else 
+		{
+			std::cout<< "+ "<< RED <<"* "<<GREEN;
+		}
+	}
+	std::cout<< GREEN << "+\n";
+	for(int i = 0; i < size; i++){
+		for(int j = 0; j < size; j++)
+		{	
+			check =0;
+			if( isIn(&maze[i][j], way))
+			{
+				check =1;
+				if(maze[i][j].getWest() == 0)
+					{
+						std::cout<<GREEN<< "| "<<RED<<"* "<<GREEN ;	
+					} 
+					else {
+						std::cout<<RED<< "  * "<<GREEN;
+					}
+			}
+			// for( int t {}; t<way.size(); t++)
+			// {	
+			// 	if(way[t] == maze[i][j])
+			// 	{
+			// 		check =1;
+			// 		if(maze[i][j].getWest() == 0)
+			// 		{
+			// 			std::cout << "| * ";	
+			// 		} 
+			// 		else {
+			// 			std::cout << "  * ";
+			// 		}
+					
+			// 	}
+			// }
+
+			if(!check)
+			{
+				if(maze[i][j].getWest() == 0)
+				{
+
+					std::cout<<GREEN << "|   ";	
+				} 
+				else {
+					std::cout << "    ";
+				}
+			}
+		}
+		
+		std::cout << "|\n";
+		for(int j = 0; j < size; j++)
+		{
+			 check=0;
+				if(maze[i][j].getSouth() == 0)
+				{
+					std::cout <<GREEN<< "+---";
+				}
+				else {
+					if(i == (size-1) && j==(size-1))
+						std::cout << "+ "<<RED<<"* "<<GREEN;
+					else
+						std::cout << "+   ";
+				}
+		}
+		std::cout << "+\n"<<RESET;
 	}
 }

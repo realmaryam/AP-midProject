@@ -29,6 +29,6 @@ class Room
 	    bool getWest();
 	    bool getVisited();
         int flag {};
-		bool operator==(const Room& r) { return pathNumber == r.pathNumber; };
+		bool operator==(const Room& r) { return roomNumber == r.roomNumber; };
 };
 #endif
