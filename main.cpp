@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include <stack>
+#include <vector>
 #include "room.h"
 
 
@@ -12,7 +12,7 @@ void openDoors(Room *room1, Room *room2, int size);
 bool checkComplete(Room **maze, int size);
 void updatePaths(Room **maze, int size, int oldPath, int newPath);
 void DFS(Room **maze , int size);
-std::pair<int,int> nextPath(Room **maze , std::pair<int,int> , std::stack<Room*>& stack);
+std::vector<Room>& nextPath(Room **maze, int size , std::pair<int,int> , std::vector<Room>& way);
 
 int main(){
 	int size;
@@ -191,31 +191,65 @@ void updatePaths(Room **maze, int size, int oldPath, int newPath){
 
 void DFS( Room** maze , int size )
 {
-    std::stack<Room*> stack;
-    //Room* current ;
-    //current = &maze[0][0];
+    std::vector<Room> way;
     int x {} , y {};
-    std::pair<int,int> location = { x, y};
-    while (location.first != size-1 && location.second != size-1 )
-    {
-        location = nextPath( maze, location , stack );
-        x = location.first;
-        y = location.second;
-
-    }
+    way = nextPath( maze, size , {y ,x} , way );
     
     
 }
 
-std::pair<int,int> nextPath(Room **maze , std::pair<int,int> location , std::stack<Room*>& stack)
+std::vector<Room>& nextPath(Room **maze , int size, std::pair<int,int> location , std::vector<Room>& way)
 {
     int x {} , y {};
-    x = location.first;
-    y = location.second;
+    y = location.first;
+    x = location.second;
     maze[y][x].setVisited(1);
-    if( maze[y][x].getSouth() && !maze[y][x].getVisited() )
+    if( x == size-1 && y == size-1 )
     {
-        stack.push(maze[y][x]);
-        
+        return way;
+    }
+
+    if( maze[y][x].getNorth() && !maze[y-1][x].getVisited() )
+    {
+        maze[y-1][x].flag = 0;
+        way.push_back(maze[y-1][x]);
+        way = nextPath(maze , size , {y-1 , x},way);
+    }
+
+    if( maze[y][x].getEast() && !maze[y][x+1].getVisited() )
+    {
+        maze[y][x+1].flag = 1 ; 
+        way.push_back(maze[y][x+1]);
+        way = nextPath(maze, size , {y , x+1}, way);
+    }
+
+    if( maze[y][x].getSouth() && !maze[y+1][x].getVisited() )
+    {
+        maze[y+1][x].flag = 2 ; 
+        way.push_back(maze[y+1][x]);
+        way = nextPath(maze, size , {y+1 , x}, way);
+    }
+    
+
+    if( maze[y][x].getWest() && !maze[y][x-1].getVisited() )
+    {
+        maze[y+1][x].flag = 3 ; 
+        way.push_back(maze[y][x-1]);
+        way = nextPath(maze, size , {y , x-1}, way);
+    }
+    else if (maze[y][x-1].getVisited() && maze[y+1][x].getVisited() &&
+                    maze[y][x+1].getVisited() && maze[y-1][x].getVisited())
+    {
+        way.pop_back();
+        if(maze[y][x].flag==0)
+        {
+            way = nextPath(maze, size , {y+1 , x}, way);
+        }
+        if(maze[y][x].flag==1)
+            way = nextPath(maze, size , {y , x-1}, way);
+        if(maze[y][x].flag==2)
+            way = nextPath(maze, size , {y-1 , x}, way);
+        if(maze[y][x].flag==3)
+            way = nextPath(maze, size , {y , x+1}, way);
     }
 }
