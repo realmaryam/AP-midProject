@@ -1,108 +1,221 @@
-#include<iostream>
-#include"Maze.h"
-#include <stdlib.h>
-#include <time.h>
-#include<vector>
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <stack>
+#include "room.h"
 
-//     #define GRID_WIDTH 10
-//     #define GRID_HEIGHT 10
-//     #define NORTH 0
-//     #define EAST 1
-//     #define SOUTH 2
-//     #define WEST 3
-//     char grid[GRID_WIDTH*GRID_HEIGHT];
-//     void ResetGrid()
-//     {
-//     // Fills the grid with walls ('#' characters).
-//     for (int i=0; i<GRID_WIDTH*GRID_HEIGHT; ++i)
-//     {
-//     grid[i] = '#';
-//     }
-//     }
 
-//     int XYToIndex( int x, int y )
-//     {
-//         return y * GRID_WIDTH + x;
-//     }
-//     int IsInBounds( int x, int y )
-//     {
-// if (x < 0 || x >= GRID_WIDTH) return false;
-// if (y < 0 || y >= GRID_HEIGHT) return false;
-// return true;
-//     }
+int getAdjacentRoom(int roomNumber, int size);
+int mazeRow(int roomNumber, int size);
+int mazeColumn(int roomNumber, int size);
+void openDoors(Room *room1, Room *room2, int size);
+bool checkComplete(Room **maze, int size);
+void updatePaths(Room **maze, int size, int oldPath, int newPath);
+void DFS(Room **maze , int size);
+std::pair<int,int> nextPath(Room **maze , std::pair<int,int> , std::stack<Room*>& stack);
 
-//     void Visit( int x, int y )
-//     {
-// // Starting at the given index, recursively visits every direction in a
-// // randomized order.
-// // Set my current location to be an empty passage.
-//         grid[ XYToIndex(x,y) ] = ' ';
-// // Create an local array containing the 4 directions and shuffle their order.
-//         int dirs[4];
-//         dirs[0] = NORTH;
-//         dirs[1] = EAST;
-//         dirs[2] = SOUTH;
-//         dirs[3] = WEST;
-//         for (int i=0; i<4; ++i)
-//         {
-//             int r = rand() & 3;
-//          //   int temp = dirs[r];
-//             std::swap(dirs[r], dirs[i]);
-//          //   dirs[r] = dirs[i];
-//          //   dirs[i] = temp;
-//         }
-// // Loop through every direction and attempt to Visit that direction.
-//         for (int i=0; i<4; ++i)
-//         {
-// // dx,dy are offsets from current location. Set them based
-// // on the next direction I wish to try.
-//             int dx=0, dy=0;
-//             switch (dirs[i])
-//             {
-//                 case NORTH: dy = -1; break;
-//                 case SOUTH: dy = 1; break;
-//                 case EAST: dx = 1; break;
-//                 case WEST: dx = -1; break;
-//             }
-// // Find the (x,y) coordinates of the grid cell 2 spots
-// // away in the given direction.
-//         int x2 = x + (dx*2);
-//         int y2 = y + (dy*2);
-//         if (IsInBounds(x2,y2))
-//         {
-//             if (grid[ XYToIndex(x2,y2) ] == '#')
-//             {
-// // (x2,y2) has not been visited yet... knock down the
-// // wall between my current position and that position
-//                 grid[ XYToIndex(x2-dx,y2-dy) ] = ' ';
-// // Recursively Visit (x2,y2)
-//                 Visit(x2,y2);
-//             }
-//         }
-//     }
-//     }
-//     void PrintGrid()
-//     {
-// // Displays the finished maze to the screen.
-//         for (int y=0; y<GRID_HEIGHT; ++y)
-//         {
-//             for (int x=0; x<GRID_WIDTH; ++x)
-//             {
-//                 std::cout << grid[XYToIndex(x,y)];
-//             }
-//         std::cout << std::endl;
-//         }
-//     }
+int main(){
+	int size;
+    srand((unsigned)time(0));
+	std::cout << "Input the desired side length for the maze (-1 for random): ";
+	std::cin >> size;
 
-int main()
+	while(size <= 3 && size != -1){
+		std::cin.clear();
+		std::cin.ignore();
+		std::cout << "Invalid size. Size must be a positive integer greater";
+		std::cout << " than 3: ";
+		std::cin >> size;
+	}
+	if(size == -1){
+		srand((unsigned)time(0));
+		size = rand() % 20 + 4;
+		std::cout << "Size randomly selected to be " << size << "\n";
+	} 
+
+	// create 2D array to be our maze
+	Room** maze = new Room*[size];
+	for(int i = 0; i < size; i++){
+		maze[i] = new Room[size];
+	}
+
+	for(int i = 0; i < size; i++){
+		for(int j = 0; j < size; j++){
+			maze[i][j].setRoomNumber((i * size) + j);
+			maze[i][j].setPathNumber((i * size) + j);
+		}
+	}
+
+	while(!checkComplete(maze, size))
+	{
+		int roomCount = size * size;
+		int room = rand() % roomCount;
+		int adjacentRoom = getAdjacentRoom(room, size);
+		int row1 = mazeRow(room, size);
+		int col1 = mazeColumn(room, size);
+		int row2 = mazeRow(adjacentRoom, size);
+		int col2 = mazeColumn(adjacentRoom, size);
+		if(maze[row1][col1].getPathNumber()!= maze[row2][col2].getPathNumber())
+		{
+			openDoors(&maze[row1][col1], &maze[row2][col2], size);
+			if(maze[row1][col1].getPathNumber() > maze[row2][col2].getPathNumber())
+			{
+				updatePaths(maze, size, maze[row1][col1].getPathNumber(),
+				maze[row2][col2].getPathNumber());
+			}
+			else {
+				updatePaths(maze, size, maze[row2][col2].getPathNumber(),
+				maze[row1][col1].getPathNumber());
+			}
+		}
+	} 
+	// Open the north door of Room 0 and the South door of the last room
+	maze[0][0].setNorth(1);
+	maze[size - 1][size - 1].setSouth(1);
+	
+	std::cout << "\nCurrent Maze:\n";
+
+	for(int i = 0; i < size; i++){
+		if(maze[0][i].getNorth() == 0){
+			std::cout << "+---";
+		} else {
+			std::cout << "+   ";
+		}
+	}
+	std::cout << "+\n";
+	for(int i = 0; i < size; i++){
+		for(int j = 0; j < size; j++){
+			if(maze[i][j].getWest() == 0){
+				std::cout << "|   ";	
+			} else {
+				std::cout << "    ";
+			}
+		}
+		std::cout << "|\n";
+		for(int j = 0; j < size; j++){
+			if(maze[i][j].getSouth() == 0){
+				std::cout << "+---";
+			} else {
+				std::cout << "+   ";
+			}
+		}
+		std::cout << "+\n";
+	}
+	
+	for(int i = 0; i < size; i++){
+		delete[] maze[i];
+	}
+	delete[] maze;
+	
+	return 0;
+}
+
+int getAdjacentRoom(int roomNumber, int size){
+	int adj, maxNumber, delta, addSub;
+	bool valid = 0;
+	maxNumber = (size * size) - 1;
+
+	while(valid == 0){
+		valid = 1;
+		delta = rand() % 2;
+		addSub = rand() % 2;
+		if (delta == 0){
+			delta = size;
+		}
+		if(addSub == 1){
+			adj = roomNumber + delta;
+		} else {
+			adj = roomNumber - delta;
+		}
+		// 4 special cases where it would not be adjacent
+		if((adj - roomNumber == 1) && (adj % size == 0)){
+			valid = 0;
+		}
+		if((roomNumber - adj == 1) && (roomNumber % size == 0)){
+			valid = 0;
+		}
+		if((adj < 0) || (adj > maxNumber)){
+			valid = 0;
+		}
+	}
+	return adj;
+}
+
+int mazeRow(int roomNumber, int size){
+	return roomNumber / size;
+}
+
+int mazeColumn(int roomNumber, int size){
+	return roomNumber % size;
+}
+
+void openDoors(Room *room1, Room *room2, int size){
+	if(room1->getRoomNumber() - room2->getRoomNumber() == 1){
+		room1->setWest(1);
+		room2->setEast(1);
+	}
+	if(room2->getRoomNumber() - room1->getRoomNumber() == 1){
+		room2->setWest(1);
+		room1->setEast(1);
+	}
+	if(room1->getRoomNumber() - room2->getRoomNumber() == size){
+		room1->setNorth(1);
+		room2->setSouth(1);
+	}
+	if(room2->getRoomNumber() - room1->getRoomNumber() == size){
+		room2->setNorth(1);
+		room1->setSouth(1);
+	}
+}
+
+bool checkComplete(Room **maze, int size){
+	for(int i = 0; i < size; i++){
+		for(int j = 0; j < size; j++){
+			if(maze[i][j].getPathNumber() != 0){
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+void updatePaths(Room **maze, int size, int oldPath, int newPath){
+	for(int i = 0; i < size; i++){
+		for(int j = 0; j < size; j++){
+			if(maze[i][j].getPathNumber() == oldPath){
+				maze[i][j].setPathNumber(newPath);
+			}
+		}
+	}
+}
+
+void DFS( Room** maze , int size )
 {
-//     srand( time(0) ); // seed random number generator.
-// ResetGrid();
-// Visit(1,1);
-// PrintGrid();
-Maze v {5 , 5};
-v.makeMaze();
+    std::stack<Room*> stack;
+    //Room* current ;
+    //current = &maze[0][0];
+    int x {} , y {};
+    std::pair<int,int> location = { x, y};
+    while (location.first != size-1 && location.second != size-1 )
+    {
+        location = nextPath( maze, location , stack );
+        x = location.first;
+        y = location.second;
 
+    }
+    
+    
+}
 
-    return 0;
+std::pair<int,int> nextPath(Room **maze , std::pair<int,int> location , std::stack<Room*>& stack)
+{
+    int x {} , y {};
+    x = location.first;
+    y = location.second;
+    maze[y][x].setVisited(1);
+    if( maze[y][x].getSouth() && !maze[y][x].getVisited() )
+    {
+        stack.push(maze[y][x]);
+        
+    }
 }
