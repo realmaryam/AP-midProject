@@ -12,7 +12,7 @@ void openDoors(Room *room1, Room *room2, int size);
 bool checkComplete(Room **maze, int size);
 void updatePaths(Room **maze, int size, int oldPath, int newPath);
 void DFS(Room **maze , int size);
-std::vector<Room>& nextPath(Room **maze, int size , std::pair<int,int> , std::vector<Room>& way);
+std::vector<Room> nextPath(Room **maze, int size , std::pair<int,int> , std::vector<Room>& way);
 
 int main(){
 	int size;
@@ -102,6 +102,8 @@ int main(){
 		std::cout << "+\n";
 	}
 	
+	DFS(maze , size);
+
 	for(int i = 0; i < size; i++){
 		delete[] maze[i];
 	}
@@ -193,24 +195,101 @@ void DFS( Room** maze , int size )
 {
     std::vector<Room> way;
     int x {} , y {};
-    way = nextPath( maze, size , {y ,x} , way );
+    way = nextPath( maze, size , {0 ,0} , way );
     
-    
+	// std::cout << "\nDFS method solved Maze:\n";
+
+	// int check {};
+	// for(int i = 0; i < size; i++){
+	// 	if(maze[0][i].getNorth() == 0){
+	// 		std::cout << "+---";
+	// 	} else {
+	// 		std::cout << "+ * ";
+	// 	}
+	// }
+	// std::cout << "+\n";
+	// for(int i = 0; i < size; i++){
+	// 	for(int j = 0; j < size; j++)
+	// 	{	
+	// 		check =0;
+	// 		for( auto it : way)
+	// 		{	
+	// 			if(it == maze[i][j])
+	// 			{
+	// 				check =1;
+	// 				if(maze[i][j].getWest() == 0)
+	// 				{
+	// 					std::cout << "| * ";	
+	// 				} else {
+	// 					std::cout << "  * ";
+	// 				}
+	// 				//break;
+	// 			}
+	// 		}
+	// 		if(!check)
+	// 		{
+	// 			if(maze[i][j].getWest() == 0)
+	// 			{
+
+	// 				std::cout << "|   ";	
+	// 			} else {
+	// 				std::cout << "    ";
+	// 			}
+	// 		}
+	// 	}
+	// 	std::cout << "|\n";
+	// 	for(int j = 0; j < size; j++)
+	// 	{
+	// 		for( auto it : way)
+	// 		{	
+	// 			check =1;
+	// 			if(it == maze[i][j])
+	// 			{
+	// 				if(maze[i][j].getSouth() == 0)
+	// 				{
+	// 					std::cout << "+---";
+	// 				} else {
+	// 					std::cout << "+ * ";
+	// 				}
+	// 			}
+	// 		}
+	// 		if(!check)
+	// 		{
+	// 			if(maze[i][j].getSouth() == 0)
+	// 			{
+	// 				std::cout << "+---";
+	// 			} else {
+	// 				std::cout << "+   ";
+	// 			}
+	// 		}
+	// 	}
+	// 	std::cout << "+\n";
+	// }
+
+
+
+
+
 }
 
-std::vector<Room>& nextPath(Room **maze , int size, std::pair<int,int> location , std::vector<Room>& way)
+std::vector<Room> nextPath(Room **maze , int size, std::pair<int,int> location , std::vector<Room>& way)
 {
+	std::cout<<"im in1\n";
     int x {} , y {};
     y = location.first;
     x = location.second;
     maze[y][x].setVisited(1);
+
     if( x == size-1 && y == size-1 )
     {
+	std::cout<<"im in final\n";
+			
         return way;
     }
 
     if( maze[y][x].getNorth() && !maze[y-1][x].getVisited() )
     {
+	std::cout<<"im in2\n";
         maze[y-1][x].flag = 0;
         way.push_back(maze[y-1][x]);
         way = nextPath(maze , size , {y-1 , x},way);
@@ -224,7 +303,7 @@ std::vector<Room>& nextPath(Room **maze , int size, std::pair<int,int> location 
     }
 
     if( maze[y][x].getSouth() && !maze[y+1][x].getVisited() )
-    {
+    {//std::cout<<"ijwogijrelvfuisvniusdhviuehv\n";
         maze[y+1][x].flag = 2 ; 
         way.push_back(maze[y+1][x]);
         way = nextPath(maze, size , {y+1 , x}, way);
@@ -241,15 +320,16 @@ std::vector<Room>& nextPath(Room **maze , int size, std::pair<int,int> location 
                     maze[y][x+1].getVisited() && maze[y-1][x].getVisited())
     {
         way.pop_back();
-        if(maze[y][x].flag==0)
-        {
-            way = nextPath(maze, size , {y+1 , x}, way);
-        }
-        if(maze[y][x].flag==1)
-            way = nextPath(maze, size , {y , x-1}, way);
-        if(maze[y][x].flag==2)
-            way = nextPath(maze, size , {y-1 , x}, way);
-        if(maze[y][x].flag==3)
-            way = nextPath(maze, size , {y , x+1}, way);
+		return way;
+        // if(maze[y][x].flag==0)
+        // {
+        //     way = nextPath(maze, size , {y+1 , x}, way);
+        // }
+        // if(maze[y][x].flag==1)
+        //     way = nextPath(maze, size , {y , x-1}, way);
+        // if(maze[y][x].flag==2)
+        //     way = nextPath(maze, size , {y-1 , x}, way);
+        // if(maze[y][x].flag==3)
+        //     way = nextPath(maze, size , {y , x+1}, way);
     }
 }
