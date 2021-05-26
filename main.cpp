@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include<list>
+#include <chrono>
 #define RESET   "\033[0m"
 #define YELLOW  "\033[1m\033[33m"      /* Bold Yellow */
 #define RED     "\033[1m\033[31m"      /* Bold Red */
@@ -17,14 +19,18 @@ bool checkComplete(Room **maze, int size);
 void updatePaths(Room **maze, int size, int oldPath, int newPath);
 void DFS(Room **maze , int size);
 std::vector<Room>& nextPath(Room **maze, int size , std::pair<int,int> ,
-	 std::vector<Room>& way , std::vector<Room> &total );
+		std::vector<Room>& way , std::vector<Room> &total );
 bool isIn (Room *room, std::vector<Room>& vector);
 void showDFS(Room **maze, int size, std::vector<Room>& way, std::vector<Room>& total );
+void cleanVisited(Room** maze, int size);
+void BFS(Room** maze, int size);
+void nextBreadth(Room** maze, int size, std::pair<int,int>, std::list<Room>& queue);
+
 void showCleaned(Room **maze, int size, std::vector<Room>& way);
 
 int main(){
 	int size;
-    //srand((unsigned)time(0));
+    srand((unsigned)time(0));
 	std::cout << "Input the desired side length for the maze (-1 for random): ";
 	std::cin >> size;
 
@@ -422,4 +428,50 @@ void showCleaned(Room **maze, int size , std::vector<Room>& way)
 		}
 		std::cout << "+\n"<<RESET;
 	}
+}
+
+void cleanVisited(Room** maze, int size)
+{
+	for (int i {}; i < size; i++)
+		for (int j {}; j < size; j++)
+			maze[i][j].setVisited(0);
+	
+}
+
+void BFS (Room** maze, int size)
+{
+	std::list<Room> queue;
+	queue.push_back(maze[0][0]);
+	//maze[0][0].setVisited(1);
+	nextBreadth(maze, size, {0, 0}, queue);
+}
+
+void nextBreadth (Room** maze, int size, std::pair<int,int> location
+		, std::list<Room>& queue)
+{
+	int y {location.first};
+	int x {location.second};
+	maze[y][x].setVisited(1);
+	queue.pop_front();
+	int n {queue.front().getRoomNumber()};
+	int ny { mazeRow(n, size)} , nx { mazeColumn(n, size)};
+
+	
+	if( y!=0 && maze[y][x].getNorth() && !maze[y-1][x].getVisited() )
+	{
+		queue.push_back(maze[y-1][x]);
+	}
+	if( x!=size-1 && maze[y][x].getEast() && !maze[y][x+1].getVisited() )
+	{
+		queue.push_back(maze[y][x+1]);
+	}
+	if( y!=size-1 && maze[y][x].getSouth() && !maze[y+1][x].getVisited() )
+	{
+		queue.push_back(maze[y+1][x]);
+	}
+	if( x!=0 && maze[y][x].getWest() && !maze[y][x-1].getVisited() )
+	{
+		queue.push_back(maze[y][x-1]);
+	}
+	nextBreadth(maze, size, {ny, nx}, queue);
 }
