@@ -7,7 +7,7 @@
 #define RED     "\033[1m\033[31m"      /* Bold Red */
 #define GREEN   "\033[1m\033[32m"      /* Bold Green */
 #include "room.h"
-
+//updated
 
 int getAdjacentRoom(int roomNumber, int size);
 int mazeRow(int roomNumber, int size);
