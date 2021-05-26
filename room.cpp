@@ -46,6 +46,11 @@ void Room::setVisited(bool x)
 	visited = x;
 }
 
+void Room::setParent(int x)
+{
+	parent = x;
+}
+
 int Room::getRoomNumber()
 {
 	return roomNumber;
@@ -79,4 +84,9 @@ bool Room::getWest()
 bool Room::getVisited()
 {
 	return visited;
+}
+
+int Room::getParent()
+{
+	return parent;
 }
