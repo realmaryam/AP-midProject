@@ -24,7 +24,10 @@ bool isIn (Room *room, std::vector<Room>& vector);
 void showDFS(Room **maze, int size, std::vector<Room>& way, std::vector<Room>& total );
 void cleanVisited(Room** maze, int size);
 void BFS(Room** maze, int size);
-void nextBreadth(Room** maze, int size, std::pair<int,int>, std::list<Room>& queue);
+std::list<Room>& nextBreadth(Room** maze, int size, std::pair<int,int> ,
+		std::list<Room>& queue);
+void BFSPath(Room** maze, int size, std::vector<Room>& path);
+void showBFS(Room **maze, int size, std::list<Room>& queue );
 
 void showCleaned(Room **maze, int size, std::vector<Room>& way);
 
@@ -443,35 +446,61 @@ void BFS (Room** maze, int size)
 	std::list<Room> queue;
 	queue.push_back(maze[0][0]);
 	//maze[0][0].setVisited(1);
-	nextBreadth(maze, size, {0, 0}, queue);
+	queue = nextBreadth(maze, size, {0, 0}, queue);
+	std::vector<Room> path;
+	path.push_back(maze[size-1][size-1]);
+	BFSPath(maze, size, path);
 }
 
-void nextBreadth (Room** maze, int size, std::pair<int,int> location
+std::list<Room>& nextBreadth (Room** maze, int size, std::pair<int,int> location
 		, std::list<Room>& queue)
 {
 	int y {location.first};
 	int x {location.second};
 	maze[y][x].setVisited(1);
+	//std::list <Room> :: iterator it;
+	Room final { queue.back()};
 	queue.pop_front();
 	int n {queue.front().getRoomNumber()};
 	int ny { mazeRow(n, size)} , nx { mazeColumn(n, size)};
-
+	if( final.getRoomNumber()== (size*size)-1 )
+	{
+		return queue;
+	}
+	if( final.getRoomNumber()!= (size*size)-1 )
+	{
 	
-	if( y!=0 && maze[y][x].getNorth() && !maze[y-1][x].getVisited() )
-	{
-		queue.push_back(maze[y-1][x]);
+		if( y!=0 && maze[y][x].getNorth() && !maze[y-1][x].getVisited() )
+		{
+			queue.push_back(maze[y-1][x]);
+			maze[y-1][x].setParent(maze[y][x].getRoomNumber());
+		}
+		if( x!=size-1 && maze[y][x].getEast() && !maze[y][x+1].getVisited() )
+		{
+			queue.push_back(maze[y][x+1]);
+			maze[y][x+1].setParent(maze[y][x].getRoomNumber());
+		}
+		if( y!=size-1 && maze[y][x].getSouth() && !maze[y+1][x].getVisited() )
+		{
+			queue.push_back(maze[y+1][x]);
+			maze[y+1][x].setParent(maze[y][x].getRoomNumber());
+		}
+		if( x!=0 && maze[y][x].getWest() && !maze[y][x-1].getVisited() )
+		{
+			queue.push_back(maze[y][x-1]);
+			maze[y][x-1].setParent(maze[y][x].getRoomNumber());
+		}
+		queue = nextBreadth(maze, size, {ny, nx}, queue);
 	}
-	if( x!=size-1 && maze[y][x].getEast() && !maze[y][x+1].getVisited() )
+
+}
+
+void BFSPath(Room** maze, int size, std::vector<Room>& path)
+{
+	int next { path.back().getParent()};
+	int ny {mazeRow(next, size)} , nx {mazeColumn(next, size)};
+	while(path.back().getRoomNumber() != 0)
 	{
-		queue.push_back(maze[y][x+1]);
+		path.push_back(maze[ny][nx]);
 	}
-	if( y!=size-1 && maze[y][x].getSouth() && !maze[y+1][x].getVisited() )
-	{
-		queue.push_back(maze[y+1][x]);
-	}
-	if( x!=0 && maze[y][x].getWest() && !maze[y][x-1].getVisited() )
-	{
-		queue.push_back(maze[y][x-1]);
-	}
-	nextBreadth(maze, size, {ny, nx}, queue);
 }
