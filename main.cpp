@@ -314,6 +314,19 @@ void showDFS(Room **maze, int size, std::vector<Room>& way, std::vector<Room>& t
 					
 				}
 			}
+			else if((isIn(&maze[i][j], total)))
+			{
+				{
+					check =1;
+					if(maze[i][j].getWest() == 0)
+					{
+						std::cout << "| * ";	
+					} else {
+						std::cout << "  * ";
+					}
+					
+				}
+			}
 
 			if(!check)
 			{
