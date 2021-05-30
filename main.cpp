@@ -34,7 +34,7 @@ void openDoors(Room *room1, Room *room2, int size);
 bool checkComplete(Room **maze, int size);
 void updatePaths(Room **maze, int size, int oldPath, int newPath);
 void showMaze(Room** maze, int size);
-void DFS(Room **maze , int size);
+void DFS(Room **maze , int size, int flag);
 std::list<Room>& nextPath(Room **maze, int size , std::pair<int,int> ,
 		std::list<Room>& way , std::list<Room> &total );
 bool isIn (Room *room, std::vector<Room>& vector);
@@ -42,7 +42,7 @@ bool isIn (Room *room, std::list<Room>& list);
 void showDFS(Room **maze, int size, std::list<Room>& total );
 void cleanVisited(Room** maze, int size);
 void resetParent(Room** maze, int size);
-void BFS(Room** maze, int size);
+void BFS(Room** maze, int size, int flag);
 std::list<Room>& nextBreadth(Room** maze, int size, std::pair<int,int> ,
 		std::list<Room>& queue);
 void BFSPath(Room** maze, int size, std::list<Room>& path);
@@ -127,10 +127,11 @@ int main(){
 		std::cout << " 1 -----> BFS \n 2 -----> DFS \n";
 		std::cin >> w;
 	}
+	int flag{};
 	if(w == 1)
-		BFS(maze, size);
+		BFS(maze, size, flag);
 	if(w == 2)
-		DFS(maze , size);
+		DFS(maze , size, flag);
 	std::cout<<RESET;
 
 	//maze destructor
@@ -255,7 +256,7 @@ void showMaze(Room** maze, int size)
 	std::cout<<RESET<<std::endl;
 }
 
-void DFS( Room** maze , int size )
+void DFS( Room** maze , int size, int flag )
 {
 	char a;
     std::list<Room> way;
@@ -267,11 +268,15 @@ void DFS( Room** maze , int size )
     way = nextPath( maze, size , {0 ,0} , way , total);
 	showDFS(maze, size, total);
 	showCleanedD(maze , size , way);
-	std::cout<<CYAN<<"Do you want to see the solution in BFS method too?\n";
-	std::cout<<"press y for yes and n for no\n";
-	std::cin>> a;
-	if(a=='y')
-		BFS(maze, size);
+	if(!flag)
+	{
+		flag++;
+		std::cout<<CYAN<<"Do you want to see the solution in BFS method too?\n";
+		std::cout<<"press y for yes and n for no\n";
+		std::cin>> a;
+		if(a=='y')
+			BFS(maze, size, flag);
+	}
 }
 
 std::list<Room>& nextPath(Room **maze , int size, std::pair<int,int> location ,
@@ -495,7 +500,7 @@ void resetParent(Room** maze, int size)
 			maze[i][j].setParent(0);
 }
 
-void BFS (Room** maze, int size)
+void BFS (Room** maze, int size, int flag)
 {
 	char a;
 	std::list<Room> queue;
@@ -509,11 +514,15 @@ void BFS (Room** maze, int size)
 	BFSPath(maze, size, path);
 	showBFS(maze, size);
 	showCleanedB(maze, size, path);
-	std::cout<<CYAN<<"Do you want to see the solution in DFS method too?\n";
-	std::cout<<"press y for yes and n for no\n";
-	std::cin>> a;
-	if(a=='y')
-		DFS(maze, size);
+	if(!flag)
+	{
+		flag++;
+		std::cout<<CYAN<<"Do you want to see the solution in DFS method too?\n";
+		std::cout<<"press y for yes and n for no\n";
+		std::cin>> a;
+		if(a=='y')
+			DFS(maze, size, flag);
+	}
 }
 
 std::list<Room>& nextBreadth (Room** maze, int size, std::pair<int,int> location
