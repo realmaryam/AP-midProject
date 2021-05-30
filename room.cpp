@@ -51,6 +51,11 @@ void Room::setParent(int x)
 	parent = x;
 }
 
+void Room::setLevel(int x)
+{
+	level = x;
+}
+
 int Room::getRoomNumber()
 {
 	return roomNumber;
@@ -89,4 +94,9 @@ bool Room::getVisited()
 int Room::getParent()
 {
 	return parent;
+}
+
+int Room::getLevel()
+{
+	return level;
 }

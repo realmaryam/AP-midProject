@@ -108,8 +108,8 @@ int main(){
 	
 	showMaze(maze , size);
 	
-	DFS(maze , size);
-	//BFS(maze, size);
+	//DFS(maze , size);
+	BFS(maze, size);
 
 	for(int i = 0; i < size; i++){
 		delete[] maze[i];
@@ -240,8 +240,8 @@ void DFS( Room** maze , int size )
 	way.push_back(maze[0][0]);
 	total.push_back(maze[0][0]);
     way = nextPath( maze, size , {0 ,0} , way , total);
-	//showCleaned(maze , size , way);
-	showDFS(maze, size, way, total);
+	showCleaned(maze , size , way);
+	//showDFS(maze, size, way, total);
 }
 
 std::list<Room>& nextPath(Room **maze , int size, std::pair<int,int> location ,
@@ -397,15 +397,173 @@ void showDFS(Room **maze, int size, std::list<Room>& way, std::list<Room>& total
 
 void showCleaned(Room **maze, int size , std::list<Room> way)
 {
-	std::cout << "\nDFS method solved Maze:\n"<<GREEN<<std::endl;
-	int check {} , check2 {};
-	int ctr{};
-	while(way.size())
+	std::cout << "\n the way you have been through:\n"<<GREEN<<std::endl;
+	int check {};
+		for(int i = 0; i < size; i++){
+		if(maze[0][i].getNorth() == 0){
+			std::cout<< "+---";
+			
+		} 
+		else 
+		{
+			std::cout<< "+ "<< RED <<"* "<<GREEN;
+		}
+		}
+		std::cout<< GREEN << "+\n";
+		for(int i = 0; i < size; i++){
+			for(int j = 0; j < size; j++)
+			{	
+				check =0;
+				if( isIn(&maze[i][j], way))
+				{
+					check =1;
+					if(maze[i][j].getWest() == 0)
+						{
+							std::cout<<GREEN<< "| "<<RED<<"* "<<GREEN ;	
+						} 
+						else {
+							std::cout<<RED<< "  * "<<GREEN;
+						}
+				}
+				if(!check)
+				{
+					if(maze[i][j].getWest() == 0)
+					{
+
+						std::cout<<GREEN << "|   ";	
+					} 
+					else {
+						std::cout << "    ";
+					}
+				}
+			}
+		
+			std::cout << "|\n";
+			for(int j = 0; j < size; j++)
+			{
+				 check=0;
+					if(maze[i][j].getSouth() == 0)
+					{
+						std::cout <<GREEN<< "+---";
+					}
+					else {
+						if(i == (size-1) && j==(size-1))
+							std::cout << "+ "<<RED<<"* "<<GREEN;
+						else
+							std::cout << "+   ";
+					}
+			}
+			std::cout << "+\n"<<RESET;
+		}
+	
+}
+
+void cleanVisited(Room** maze, int size)
+{
+	for (int i {}; i < size; i++)
+		for (int j {}; j < size; j++)
+			maze[i][j].setVisited(0);
+	
+}
+
+void resetParent(Room** maze, int size)
+{
+	for (int i {}; i < size; i++)
+		for (int j {}; j < size; j++)
+			maze[i][j].setParent(0);
+}
+
+void BFS (Room** maze, int size)
+{
+	std::list<Room> queue;
+	std::list<Room> all;
+	resetParent(maze, size);
+	cleanVisited(maze, size);
+	queue.push_back(maze[0][0]);
+	all.push_back(maze[0][0]);
+	queue = nextBreadth(maze, size, {0, 0}, queue, all);
+	std::vector<Room> path;
+	path.push_back(maze[size-1][size-1]);
+	BFSPath(maze, size, path);
+	showBFS(maze, size, all, path);
+}
+
+std::list<Room>& nextBreadth (Room** maze, int size, std::pair<int,int> location
+		, std::list<Room>& queue , std::list<Room>& all)
+{
+	int y {location.first};
+	int x {location.second};
+	//int Level { 1 };
+	maze[y][x].setVisited(1);
+	Room final { queue.back()};
+	
+	if( final.getRoomNumber()== (size*size)-1 )
 	{
-		
-		
+		return queue;
+	}
+	if( final.getRoomNumber()!= (size*size)-1 )
+	{
+	
+		if( y!=0 && maze[y][x].getNorth() && !maze[y-1][x].getVisited() )
+		{
+			maze[y-1][x].setLevel(maze[y][x].getLevel()+1);
+			queue.push_back(maze[y-1][x]);
+			all.push_back(maze[y-1][x]);
+			maze[y-1][x].setParent(maze[y][x].getRoomNumber());
+		}
+		if( x!=size-1 && maze[y][x].getEast() && !maze[y][x+1].getVisited() )
+		{
+			maze[y][x+1].setLevel(maze[y][x].getLevel()+1);
+			queue.push_back(maze[y][x+1]);
+			all.push_back(maze[y][x+1]);
+			maze[y][x+1].setParent(maze[y][x].getRoomNumber());
+		}
+		if( y!=size-1 && maze[y][x].getSouth() && !maze[y+1][x].getVisited() )
+		{
+			maze[y+1][x].setLevel(maze[y][x].getLevel()+1);
+			queue.push_back(maze[y+1][x]);
+			all.push_back(maze[y+1][x]);
+			maze[y+1][x].setParent(maze[y][x].getRoomNumber());
+		}
+		if( x!=0 && maze[y][x].getWest() && !maze[y][x-1].getVisited() )
+		{
+			maze[y][x-1].setLevel(maze[y][x].getLevel()+1);
+			queue.push_back(maze[y][x-1]);
+			all.push_back(maze[y][x-1]);
+			maze[y][x-1].setParent(maze[y][x].getRoomNumber());
+		}
+	}
+	queue.pop_front();
+	int n {queue.front().getRoomNumber()};
+	int ny { mazeRow(n, size)} , nx { mazeColumn(n, size)};
+	queue = nextBreadth(maze, size, {ny, nx}, queue, all);
+
+}
+
+void BFSPath(Room** maze, int size, std::vector<Room>& path)
+{
+	int next { path.back().getParent()};
+	int ny {mazeRow(next, size)} , nx {mazeColumn(next, size)};
+	while(path.back().getRoomNumber() != 0)
+	{
+	 	path.push_back(maze[ny][nx]);
+		next = path.back().getParent();
+		ny = mazeRow(next, size);
+		nx = mazeColumn(next, size);
+	}
+}
+
+void showBFS(Room **maze, int size, std::list<Room>& all, std::vector<Room>& path )
+{
+	std::cout << "\nBFS method solved Maze:\n"<<GREEN<<std::endl;
+	int check {} , check2 {};
+	int L { maze[size-1][size-1].getLevel() +1 };
+	int level {};
+	while(L)
+	{ 
+		L--;
 		std::cout << "\033[2J\033[1;1H";
-		delay (300);
+		delay (500);
 		for(int i = 0; i < size; i++){
 		if(maze[0][i].getNorth() == 0){
 			std::cout<< "+---";
@@ -421,11 +579,9 @@ void showCleaned(Room **maze, int size , std::list<Room> way)
 			for(int j = 0; j < size; j++)
 			{	
 				check =0;
-				if( maze[i][j]==way.front() && !check2)
+				if( maze[i][j].getLevel()==level )
 				{
 					check =1;
-					check2 =1;
-					way.pop_front();
 					if(maze[i][j].getWest() == 0)
 						{
 							std::cout<<GREEN<< "| "<<YELLOW<<"@ "<<GREEN ;	
@@ -456,23 +612,17 @@ void showCleaned(Room **maze, int size , std::list<Room> way)
 						std::cout <<GREEN<< "+---";
 					}
 					 else {
-					// 	if(i == (size-1) && j==(size-1))
-					// 		std::cout << "+ "<<YELLOW<<"* "<<GREEN;
-					// 	else
 							std::cout << "+   ";
 					}
 			}
 			std::cout << "+\n"<<RESET;
 		}
-	
-	check2 =0;
+	level++;
+	std::cout<< " current level: "<< level-1 <<std::endl;
 	}
-	
 
 	// int check {};
-	// for (size_t i {}; i < way.size(); i++)
-	// {
-	// 	for(int i = 0; i < size; i++){
+	// for(int i = 0; i < size; i++){
 	// 	if(maze[0][i].getNorth() == 0){
 	// 		std::cout<< "+---";
 			
@@ -481,219 +631,63 @@ void showCleaned(Room **maze, int size , std::list<Room> way)
 	// 	{
 	// 		std::cout<< "+ "<< YELLOW <<"* "<<GREEN;
 	// 	}
-	// 	}
-	// 	std::cout<< GREEN << "+\n";
-	// 	for(int i = 0; i < size; i++){
-	// 		for(int j = 0; j < size; j++)
-	// 		{	
-	// 			check =0;
-	// 			if( isIn(&maze[i][j], way))
-	// 			{
-	// 				check =1;
-	// 				if(maze[i][j].getWest() == 0)
-	// 					{
-	// 						std::cout<<GREEN<< "| "<<YELLOW<<"* "<<GREEN ;	
-	// 					} 
-	// 					else {
-	// 						std::cout<<YELLOW<< "  * "<<GREEN;
-	// 					}
-	// 			}
-	// 			if(!check)
-	// 			{
-	// 				if(maze[i][j].getWest() == 0)
+	// }
+	// std::cout<< GREEN << "+\n";
+	// for(int i = 0; i < size; i++){
+	// 	for(int j = 0; j < size; j++)
+	// 	{	
+	// 		check =0;
+	// 		if( isIn(&maze[i][j], path))
+	// 		{
+	// 			check =1;
+	// 			if(maze[i][j].getWest() == 0)
 	// 				{
-
-	// 					std::cout<<GREEN << "|   ";	
+	// 					std::cout<<GREEN<< "| "<<YELLOW<<"* "<<GREEN ;	
 	// 				} 
 	// 				else {
-	// 					std::cout << "    ";
+	// 					std::cout<<YELLOW<< "  * "<<GREEN;
 	// 				}
+	// 		}
+	// 		else if(isIn(&maze[i][j], all))
+	// 		{
+	// 			check =1;
+	// 			if(maze[i][j].getWest() == 0)
+	// 				{
+	// 					std::cout<<GREEN<< "| "<<RED<<"* "<<GREEN ;	
+	// 				} 
+	// 				else {
+	// 					std::cout<<RED<< "  * "<<GREEN;
+	// 				}
+	// 		}
+
+	// 		if(!check)
+	// 		{
+	// 			if(maze[i][j].getWest() == 0)
+	// 			{
+
+	// 				std::cout<<GREEN << "|   ";	
+	// 			} 
+	// 			else {
+	// 				std::cout << "    ";
 	// 			}
 	// 		}
-		
-	// 		std::cout << "|\n";
-	// 		for(int j = 0; j < size; j++)
-	// 		{
-	// 			 check=0;
-	// 				if(maze[i][j].getSouth() == 0)
-	// 				{
-	// 					std::cout <<GREEN<< "+---";
-	// 				}
-	// 				else {
-	// 					if(i == (size-1) && j==(size-1))
-	// 						std::cout << "+ "<<YELLOW<<"* "<<GREEN;
-	// 					else
-	// 						std::cout << "+   ";
-	// 				}
-	// 		}
-	// 		std::cout << "+\n"<<RESET;
 	// 	}
+		
+	// 	std::cout << "|\n";
+	// 	for(int j = 0; j < size; j++)
+	// 	{
+	// 		 check=0;
+	// 			if(maze[i][j].getSouth() == 0)
+	// 			{
+	// 				std::cout <<GREEN<< "+---";
+	// 			}
+	// 			else {
+	// 				if(i == (size-1) && j==(size-1))
+	// 					std::cout << "+ "<<YELLOW<<"* "<<GREEN;
+	// 				else
+	// 					std::cout << "+   ";
+	// 			}
+	// 	}
+	// 	std::cout << "+\n"<<RESET;
 	// }
-	
-	
-}
-
-void cleanVisited(Room** maze, int size)
-{
-	for (int i {}; i < size; i++)
-		for (int j {}; j < size; j++)
-			maze[i][j].setVisited(0);
-	
-}
-
-void resetParent(Room** maze, int size)
-{
-	for (int i {}; i < size; i++)
-		for (int j {}; j < size; j++)
-			maze[i][j].setParent(0);
-}
-
-void BFS (Room** maze, int size)
-{
-	std::list<Room> queue;
-	std::list<Room> all;
-	queue.push_back(maze[0][0]);
-	all.push_back(maze[0][0]);
-	queue = nextBreadth(maze, size, {0, 0}, queue, all);
-	std::vector<Room> path;
-	path.push_back(maze[size-1][size-1]);
-	BFSPath(maze, size, path);
-	showBFS(maze, size, all, path);
-}
-
-std::list<Room>& nextBreadth (Room** maze, int size, std::pair<int,int> location
-		, std::list<Room>& queue , std::list<Room>& all)
-{
-	int y {location.first};
-	int x {location.second};
-	maze[y][x].setVisited(1);
-	Room final { queue.back()};
-	
-	if( final.getRoomNumber()== (size*size)-1 )
-	{
-		return queue;
-	}
-	if( final.getRoomNumber()!= (size*size)-1 )
-	{
-	
-		if( y!=0 && maze[y][x].getNorth() && !maze[y-1][x].getVisited() )
-		{
-			queue.push_back(maze[y-1][x]);
-			all.push_back(maze[y-1][x]);
-			maze[y-1][x].setParent(maze[y][x].getRoomNumber());
-		}
-		if( x!=size-1 && maze[y][x].getEast() && !maze[y][x+1].getVisited() )
-		{
-			queue.push_back(maze[y][x+1]);
-			all.push_back(maze[y][x+1]);
-			maze[y][x+1].setParent(maze[y][x].getRoomNumber());
-		}
-		if( y!=size-1 && maze[y][x].getSouth() && !maze[y+1][x].getVisited() )
-		{
-			queue.push_back(maze[y+1][x]);
-			all.push_back(maze[y+1][x]);
-			maze[y+1][x].setParent(maze[y][x].getRoomNumber());
-		}
-		if( x!=0 && maze[y][x].getWest() && !maze[y][x-1].getVisited() )
-		{
-			queue.push_back(maze[y][x-1]);
-			all.push_back(maze[y][x-1]);
-
-			maze[y][x-1].setParent(maze[y][x].getRoomNumber());
-		}
-		
-	}
-	queue.pop_front();
-	int n {queue.front().getRoomNumber()};
-	int ny { mazeRow(n, size)} , nx { mazeColumn(n, size)};
-	queue = nextBreadth(maze, size, {ny, nx}, queue, all);
-
-}
-
-void BFSPath(Room** maze, int size, std::vector<Room>& path)
-{
-	int next { path.back().getParent()};
-	int ny {mazeRow(next, size)} , nx {mazeColumn(next, size)};
-	while(path.back().getRoomNumber() != 0)
-	{
-	 	path.push_back(maze[ny][nx]);
-		next = path.back().getParent();
-		ny = mazeRow(next, size);
-		nx = mazeColumn(next, size);
-	}
-}
-
-void showBFS(Room **maze, int size, std::list<Room>& all, std::vector<Room>& path )
-{
-		std::cout << "\nBFS method solved Maze:\n"<<GREEN<<std::endl;
-
-	int check {};
-	for(int i = 0; i < size; i++){
-		if(maze[0][i].getNorth() == 0){
-			std::cout<< "+---";
-			
-		} 
-		else 
-		{
-			std::cout<< "+ "<< YELLOW <<"* "<<GREEN;
-		}
-	}
-	std::cout<< GREEN << "+\n";
-	for(int i = 0; i < size; i++){
-		for(int j = 0; j < size; j++)
-		{	
-			check =0;
-			if( isIn(&maze[i][j], path))
-			{
-				check =1;
-				if(maze[i][j].getWest() == 0)
-					{
-						std::cout<<GREEN<< "| "<<YELLOW<<"* "<<GREEN ;	
-					} 
-					else {
-						std::cout<<YELLOW<< "  * "<<GREEN;
-					}
-			}
-			else if(isIn(&maze[i][j], all))
-			{
-				check =1;
-				if(maze[i][j].getWest() == 0)
-					{
-						std::cout<<GREEN<< "| "<<RED<<"* "<<GREEN ;	
-					} 
-					else {
-						std::cout<<RED<< "  * "<<GREEN;
-					}
-			}
-
-			if(!check)
-			{
-				if(maze[i][j].getWest() == 0)
-				{
-
-					std::cout<<GREEN << "|   ";	
-				} 
-				else {
-					std::cout << "    ";
-				}
-			}
-		}
-		
-		std::cout << "|\n";
-		for(int j = 0; j < size; j++)
-		{
-			 check=0;
-				if(maze[i][j].getSouth() == 0)
-				{
-					std::cout <<GREEN<< "+---";
-				}
-				else {
-					if(i == (size-1) && j==(size-1))
-						std::cout << "+ "<<YELLOW<<"* "<<GREEN;
-					else
-						std::cout << "+   ";
-				}
-		}
-		std::cout << "+\n"<<RESET;
-	}
 }

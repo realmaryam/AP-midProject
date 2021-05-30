@@ -12,6 +12,7 @@ class Room
 	    bool west {};
 	    bool visited {};
 		int parent {};
+		int level {};
 
 	public:
 	    Room();
@@ -23,6 +24,7 @@ class Room
 	    void setWest(bool x);
 	    void setVisited(bool x);
 		void setParent(int x);
+		void setLevel(int x);
 	    int getRoomNumber();
 	    int getPathNumber();
 	    bool getNorth();
@@ -31,7 +33,7 @@ class Room
 	    bool getWest();
 	    bool getVisited();
 		int getParent();
-        int flag {};
+		int getLevel();
 		bool operator==(const Room& r) { return roomNumber == r.roomNumber; };
 };
 #endif
