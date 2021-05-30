@@ -4,15 +4,15 @@
 class Room
 {
 	private:
-	    int roomNumber {};
-	    int pathNumber {};
-	    bool north {};
-	    bool south {};
-	    bool east {};
-	    bool west {};
-	    bool visited {};
-		int parent {};
-		int level {};
+	    int roomNumber ;
+	    int pathNumber ;
+	    bool north ;
+	    bool south ;
+	    bool east ;
+	    bool west ;
+	    bool visited;
+		int parent;
+		int level;
 
 	public:
 	    Room();

@@ -9,6 +9,8 @@ Room::Room()
 	east = 0;
 	west = 0;
 	visited = 0;
+	parent = 0;
+	level = -1;
 }
 
 void Room::setRoomNumber(int x)
