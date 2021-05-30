@@ -57,7 +57,8 @@ int main(){
 	std::cout<<"Hey! This is a program that builds a square form maze and then solves it! \n";
 	std::cout<< " in two method : Breadth First Search (BFS) and Depth First Search (DFS) \n";
 	delay(50);
-	std::cout<< "lets see how it is!\n You just need to press the size of side of the maze you want! (as intiger number)\n";
+	std::cout<< "lets see how it is!\n You just need to press the size of side of the maze"; 
+	std::cout<<"you want! (as intiger number and greater than 3)\n";
 	std::cout << " or you can press -1 for random size : ";
 	std::cin >> size;
 
@@ -122,10 +123,9 @@ int main(){
 	std::cin>>w;
 	while(w != 1 && w != 2){
 		std::cin.clear();
-		std::cin.ignore();
 		std::cout << "Invalid input! you should press 1 or 2 for this mean:\n";
 		std::cout << " 1 -----> BFS \n 2 -----> DFS \n";
-		std::cin >> size;
+		std::cin >> w;
 	}
 	if(w == 1)
 		BFS(maze, size);
@@ -419,7 +419,7 @@ void showDFS(Room **maze, int size, std::list<Room>& total )
 
 void showCleanedD(Room **maze, int size , std::list<Room>& way)
 {
-	std::cout <<"\n the path you have been through @DFS method:\n"<<GREEN<<std::endl;
+	std::cout <<"\n the main path you have been through @DFS method:\n"<<GREEN<<std::endl;
 	int check {};
 		for(int i = 0; i < size; i++){
 		if(maze[0][i].getNorth() == 0){
@@ -497,6 +497,7 @@ void resetParent(Room** maze, int size)
 
 void BFS (Room** maze, int size)
 {
+	char a;
 	std::list<Room> queue;
 	maze[0][0].setLevel(0);
 	resetParent(maze, size);
@@ -508,6 +509,11 @@ void BFS (Room** maze, int size)
 	BFSPath(maze, size, path);
 	showBFS(maze, size);
 	showCleanedB(maze, size, path);
+	std::cout<<CYAN<<"Do you want to see the solution in DFS method too?\n";
+	std::cout<<"press y for yes and n for no\n";
+	std::cin>> a;
+	if(a=='y')
+		DFS(maze, size);
 }
 
 std::list<Room>& nextBreadth (Room** maze, int size, std::pair<int,int> location
@@ -573,7 +579,7 @@ void BFSPath(Room** maze, int size, std::list<Room>& path)
 
 void showBFS(Room **maze, int size )
 {
-	std::cout << "\nBFS method solving Maze:\n"<<GREEN<<std::endl;
+	
 	int check {} ;
 	int L { maze[size-1][size-1].getLevel() +1 };
 	int level {};
@@ -582,6 +588,7 @@ void showBFS(Room **maze, int size )
 		L--;
 		std::cout << "\033[2J\033[1;1H";
 		delay (500);
+		std::cout<<RESET << "\nBFS method solving Maze:\n"<<GREEN<<std::endl;
 		for(int i = 0; i < size; i++){
 		if(maze[0][i].getNorth() == 0){
 			std::cout<< "+---";
@@ -643,7 +650,7 @@ void showBFS(Room **maze, int size )
 
 void showCleanedB(Room **maze, int size, std::list<Room>& path)
 {
-	std::cout<<"the path you have been through @BFS method:"<<std::endl;
+	std::cout<<"the main path you have been through @BFS method:"<<std::endl;
 	int check {};
 	for(int i = 0; i < size; i++){
 		if(maze[0][i].getNorth() == 0){
